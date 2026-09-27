@@ -74,7 +74,7 @@ A franquia libera no webhook ou, se a pessoa pagar antes de criar a conta, no pr
 A busca real exige sessão e assinatura autorizada. Os exemplos (`ENABLE_SAMPLE_DATA=true`) continuam disponíveis sem conta, só para prévia local.
 
 ## Análise para campanha
-A dor mais concreta é o tempo gasto procurando empresas e organizando prospecção. Público inicial sugerido: freelancers de sites e pequenas agências. Oferta: encontrar empresas por região e priorizar as que não têm site listado. Não alegar “clientes prontos para comprar” nem “empresas sem site confirmado”.
+A dor mais concreta é o tempo gasto para encontrar clientes e organizar a lista. Público inicial sugerido: freelancers de sites e pequenas agências. Oferta: encontrar clientes por cidade e priorizar os que não têm site listado. Não alegar “clientes prontos para comprar” nem “negócio sem site confirmado”.
 Antes de tráfego de assinatura: medir custo por resultado e margem, validar franquias, fazer busca real e pagamento/cancelamento de ponta a ponta. A página atual serve para apresentação e conversas de pré-lançamento; o contato aponta a cub4studio.com/#contato. Confirme esse destino antes de publicar.
 Preços e franquias são hipóteses comerciais, não recomendações baseadas em tarifas atuais. Descontos por volume podem destruir a margem se o custo de dados for alto.
 

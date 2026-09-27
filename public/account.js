@@ -32,7 +32,7 @@ function renderPlans(plans) {
       <span class="plan-type">${active ? 'SEU PLANO ATUAL' : 'PLANO MENSAL'}</span>
       <h3>${esc(plan.name)}</h3>
       <div class="price">${esc(plan.label)}</div>
-      <div class="allowance">${esc(plan.quota)} empresas por mês</div>
+      <div class="allowance">${esc(plan.quota)} clientes por mês</div>
       <button class="button ${highlight ? '' : 'outline'}" data-plan="${esc(plan.id)}" ${user && billing.configured ? '' : 'disabled'}>
         ${active ? `Renovar no ${esc(label())}` : `Assinar com ${esc(label())}`} <span>↗</span>
       </button>
@@ -52,7 +52,7 @@ function describeSession() {
   const sub = user.subscription || {};
   logout.hidden = false;
   if (loginLink) loginLink.hidden = true;
-  sessionLine.textContent = `${user.email} · ${sub.planName || 'sem plano'} · ${sub.remaining || 0}/${sub.quota || 0} empresas restantes`;
+  sessionLine.textContent = `${user.email} · ${sub.planName || 'sem plano'} · ${sub.remaining || 0}/${sub.quota || 0} clientes restantes`;
   lead.textContent = billing.configured
     ? `Checkout ${label()} disponível. A franquia só é liberada depois da confirmação do webhook.`
     : `Conta pronta. Configure os links e o webhook do ${label()} no servidor para abrir o checkout.`;

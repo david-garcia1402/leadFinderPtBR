@@ -9,7 +9,7 @@ function updateBrief() {
   const price = plan.selectedOptions[0].dataset.price;
   document.getElementById('interest-copy').textContent = english
     ? `${plan.value} — ${price}. Tell us what you sell and where you want to prospect. Launch interest only; no payment or reservation.`
-    : `${plan.value} — ${price}. Conte o que você vende e onde deseja prospectar. Interesse no lançamento, sem cobrança ou reserva.`;
+    : `${plan.value} — ${price}. Conte o que você vende e onde quer encontrar clientes. Interesse no lançamento, sem cobrança ou reserva.`;
   brief.value = english
     ? `I am interested in Lead Finder: ${plan.value} (${price}). I sell: ${service.value}. Target market: ${market.value.trim() || 'To discuss'}. Please confirm launch availability and monthly allowances.`
     : `Tenho interesse no Lead Finder: ${plan.value} (${price}). Vendo: ${service.value}. Mercado desejado: ${market.value.trim() || 'A definir'}. Gostaria de confirmar a disponibilidade no lançamento e a franquia mensal.`;
