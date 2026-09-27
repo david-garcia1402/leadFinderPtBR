@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {validateSearch,normalize,csv,demoLeads} from '../lib/leads.mjs';
+test('rejects expensive or invalid searches',()=>{for(const limit of [0,-1,26,1000,1.2])assert.throws(()=>validateSearch({niche:'Dentist',location:'Austin',limit}));assert.throws(()=>validateSearch({niche:'',location:'Austin',limit:10}));});
+test('missing website stays unknown and unsafe URLs are removed',()=>{const r=normalize({name:'Business',site:'javascript:alert(1)'});assert.equal(r.website,'');assert.equal(r.phone,'');assert.equal(r.rating,null);});
+test('CSV escapes quotes, preserves newlines, and neutralizes spreadsheet formulas',()=>{const output=csv([{name:'=HYPERLINK("evil")',phone:'+1202',address:'Line 1\nLine 2'}]);assert.ok(output.includes('"\'=HYPERLINK(""evil"")"'));assert.ok(output.includes('"\'+1202"'));assert.ok(output.includes('"Line 1\nLine 2"'));});
+test('demo stays labeled and respects limit',()=>{const rows=demoLeads('Dentist','Austin',5);assert.equal(rows.length,5);assert.ok(rows.every(r=>r.demo&&r.source==='Dados ilustrativos'&&r.name.includes('(exemplo)')));});
