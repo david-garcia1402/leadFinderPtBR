@@ -25,6 +25,14 @@ node --env-file-if-exists=.env server.mjs
 
 Não é um site puramente estático: o painel depende do servidor Node. Não abrir index.html diretamente. Não importar como tema Shopify. Não enviar a pasta dist diretamente a um Cloudflare Worker.
 
+## Cloudflare Workers
+
+O build do Cloudflare executa `npx wrangler deploy` na raiz do repositório. O `wrangler.jsonc` dessa raiz define `assets.directory` como `./leadfinder-pt-BR/public`. O Wrangler só procura `index.html` na pasta atual e nos filhos imediatos; com o site em `leadfinder-pt-BR/public/`, a detecção automática falha com "Could not detect a directory containing static files".
+
+Se a raiz do build no painel for `leadfinder-pt-BR`, vale o `wrangler.jsonc` dessa pasta (`assets.directory`: `./public`). Os dois arquivos publicam o mesmo Worker, `leadfinder-pt-br`.
+
+`public/_redirects` entrega `/app`, `/entrar` e `/conta`. Contas, busca e checkout continuam no servidor Node (`npm start`).
+
 ## O que mudou
 - Página comercial em português, separada do painel, com copy de benefícios, recursos, FAQ e contato.
 - Nova assinatura vetorial Lead Finder; mantém roxo/coral. É uma proposta visual do produto, não uma reprodução certificada da logo corporativa.
