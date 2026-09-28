@@ -8,6 +8,7 @@ import {createStore} from '../lib/store.mjs';
 import {createAuth} from '../lib/auth.mjs';
 import {createBilling} from '../lib/billing.mjs';
 import {getPlan,listPlans} from '../lib/plans.mjs';
+import {checkoutUrlFor,planFromProduct,DEFAULT_KIWIFY_CHECKOUTS} from '../lib/providers.mjs';
 import {parseWebhookPayload,verifyWebhookSignature,webhookManifest} from '../lib/mercadopago.mjs';
 
 test('catalog keeps the proposed BRL plans and quotas', () => {
@@ -55,16 +56,27 @@ test('subscription reserve is per user and blocks inactive accounts', async () =
   }
 });
 
-test('checkout stays pending until the active provider has links or credentials', async () => {
+test('Kiwify checkout defaults to the published plan links', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'lf-chk-'));
   try {
     const store = await createStore(join(dir, 'accounts.json'));
     const auth = createAuth(store);
     const billing = createBilling(store, {});
     const user = await auth.register({email:'e@example.com', password:'senha-forte'});
-    assert.equal(billing.configured(), false);
+    assert.equal(billing.configured(), true);
     assert.equal(billing.publicConfig().provider, 'kiwify');
-    await assert.rejects(() => billing.startCheckout(user, 'essencial'), /ainda não configurado/);
+    assert.equal(checkoutUrlFor('essencial', {}), DEFAULT_KIWIFY_CHECKOUTS.essencial);
+    assert.equal(checkoutUrlFor('profissional', {}), DEFAULT_KIWIFY_CHECKOUTS.profissional);
+    assert.equal(checkoutUrlFor('escala', {}), DEFAULT_KIWIFY_CHECKOUTS.escala);
+    const started = await billing.startCheckout(user, 'profissional');
+    assert.equal(started.initPoint.startsWith('https://pay.kiwify.com.br/mE9NqXs'), true);
+    assert.match(started.initPoint, /email=e%40example.com/);
+    assert.equal(planFromProduct({productName:'Plano - Essencial - 100 leads'}), 'essencial');
+    assert.equal(planFromProduct({productName:'Plano - Profissional'}), 'profissional');
+    assert.equal(planFromProduct({productName:'Plano - Escala'}), 'escala');
+    const override = createBilling(store, {BILLING_PROVIDER:'kiwify', KIWIFY_CHECKOUT_ESSENCIAL:'https://pay.kiwify.com.br/custom'});
+    const custom = await override.startCheckout(user, 'essencial');
+    assert.match(custom.initPoint, /pay\.kiwify\.com\.br\/custom/);
   } finally {
     await rm(dir, {recursive:true, force:true});
   }

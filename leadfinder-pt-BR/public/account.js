@@ -67,21 +67,25 @@ logout.onclick = async () => {
   }
 };
 
-plansBox.addEventListener('click', async event => {
-  const button = event.target.closest('button[data-plan]');
-  if (!button || button.disabled) return;
+async function openCheckout(planId) {
   status.textContent = `Abrindo o checkout ${label()}…`;
   try {
     const checkout = await api('/api/billing/checkout', {
       method:'POST',
       headers:{'Content-Type':'application/json','X-Cub4-Client':'lead-finder'},
-      body: JSON.stringify({planId: button.dataset.plan})
+      body: JSON.stringify({planId})
     });
     if (checkout.initPoint) location.href = checkout.initPoint;
     else status.textContent = `O ${label()} não devolveu a URL de pagamento.`;
   } catch (error) {
     status.textContent = error.message;
   }
+}
+
+plansBox.addEventListener('click', event => {
+  const button = event.target.closest('button[data-plan]');
+  if (!button || button.disabled) return;
+  openCheckout(button.dataset.plan);
 });
 
 Promise.all([
@@ -91,10 +95,13 @@ Promise.all([
   user = session.user || null;
   billing = catalog.billing || billing;
   describeSession();
-  renderPlans(catalog.plans || []);
+  const plans = catalog.plans || [];
+  renderPlans(plans);
   if (params.get('checkout') === 'retorno') {
     status.textContent = `Retorno do ${label()} registrado. A franquia só muda depois da confirmação do webhook.`;
+    return;
   }
+  if (user && billing.configured && plans.some(plan => plan.id === selected)) openCheckout(selected);
 }).catch(() => {
   sessionLine.textContent = 'Servidor indisponível. Reinicie npm run dev.';
 });

@@ -23,15 +23,7 @@ cd dist
 node --env-file-if-exists=.env server.mjs
 ```
 
-Não é um site puramente estático: o painel depende da API. Não abrir index.html diretamente. Não importar como tema Shopify.
-
-## Cloudflare Workers
-
-O deploy do painel usa `npx wrangler deploy` com `wrangler.jsonc`. A pasta `public/` é o diretório de arquivos estáticos (`assets.directory`). Sem esse arquivo, o Wrangler 4 não encontra HTML, CSS ou JS e o build do Cloudflare falha com "Could not detect a directory containing static files".
-
-O Worker em `src/worker.mjs` atende `/`, `/app`, `/entrar`, `/conta`, `/api/*`, `robots.txt` e `sitemap.xml`, e lê os arquivos de `public/` pelo binding `ASSETS`. Contas neste Worker ficam na memória do isolate. Para persistência entre reinícios, use o servidor Node com `DATA_DIR`, ou configure um armazenamento durável antes de vender.
-
-Segredos (`OUTSCRAPER_API_KEY`, tokens de webhook, `PUBLIC_SITE_URL`) não vão no `wrangler.jsonc`. Defina-os no painel do Cloudflare ou com `npx wrangler secret put`. `PUBLIC_SITE_URL` vazio mantém a indexação desligada.
+Não é um site puramente estático: o painel depende do servidor Node. Não abrir index.html diretamente. Não importar como tema Shopify. Não enviar a pasta dist diretamente a um Cloudflare Worker.
 
 ## O que mudou
 - Página comercial em português, separada do painel, com copy de benefícios, recursos, FAQ e contato.
@@ -39,7 +31,7 @@ Segredos (`OUTSCRAPER_API_KEY`, tokens de webhook, `PUBLIC_SITE_URL`) não vão 
 - Prévia do produto em HTML/CSS, nítida em qualquer tela e sem imagens de banco genéricas. Empresas da prévia são fictícias e identificadas.
 - Três planos em colunas no desktop e empilhados no celular. Profissional em destaque.
 - Preços propostos: R$ 39,99 / 59,99 / 89,99; franquias propostas: 100 / 300 / 600 empresas. Não estão conectados ao consumo. Devem ser validados antes de venda.
-- CTA de interesse seleciona o plano e encaminha ao contato institucional; não existe checkout nem cadastro de lista de espera.
+- O botão de cada plano abre `/entrar?plano=` e, depois do login, o checkout Kiwify correspondente.
 - Exemplos desativados por padrão. Nunca substitui silenciosamente a busca real por dados fictícios.
 - Preservados filtros, favoritos no navegador, CSV e rascunho de abordagem.
 - Configuração explícita de origem HTTPS, menor exposição de informações do servidor e restrição adicional para busca real local.
@@ -54,7 +46,7 @@ O teto local é global, não por assinante nem um teto financeiro no provedor. R
 Opcionalmente defina `ENABLE_SAMPLE_DATA=true` e escolha a fonte de exemplos no painel. Dados ficam explicitamente identificados como fictícios. Não use exemplos como resultados reais em anúncios. Dados salvos nesta versão ficam apenas no navegador.
 
 ## Estado real do produto
-Esta versão pt-BR agora tem contas com e-mail/senha, sessão HttpOnly e franquia por cliente. O checkout padrão é a **Kiwify**, com adaptadores para Mercado Pago e para qualquer checkout hospedado (Hotmart, Eduzz, Stripe Payment Link, etc.). **Não cobra** até os links/tokens do provedor estarem no `.env`. Use o mesmo e-mail da compra e da conta. Não anunciar assinatura imediata nem retorno financeiro.
+Esta versão pt-BR agora tem contas com e-mail/senha, sessão HttpOnly e franquia por cliente. O checkout padrão é a **Kiwify**, com adaptadores para Mercado Pago e para qualquer checkout hospedado (Hotmart, Eduzz, Stripe Payment Link, etc.). Sem variáveis, os três checkouts públicos (Essencial, Profissional e Escala) são usados. A franquia só libera com `KIWIFY_WEBHOOK_TOKEN`. Use o mesmo e-mail da compra e da conta. Não anunciar retorno financeiro.
 
 Ainda faltam antes de vender em escala: recuperação de acesso por e-mail; banco dedicado; exclusão/retenção de dados; documentos reais de privacidade/termos; observabilidade e um pagamento de teste ponta a ponta. Não há pixels de publicidade nesta versão.
 

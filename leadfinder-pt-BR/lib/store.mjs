@@ -3,23 +3,6 @@ import {dirname} from 'node:path';
 
 const empty = () => ({users:[],sessions:[],subscriptions:[],checkouts:[],events:[],entitlements:[]});
 
-export function createMemoryStore() {
-  let data = empty();
-  let queue = Promise.resolve();
-  return {
-    snapshot: () => data,
-    update(mutator) {
-      const run = queue.then(async () => {
-        const next = await mutator(data);
-        if (next) data = next;
-        return data;
-      });
-      queue = run.catch(() => {});
-      return run;
-    }
-  };
-}
-
 export async function createStore(file) {
   await mkdir(dirname(file), {recursive:true});
   let data = empty();

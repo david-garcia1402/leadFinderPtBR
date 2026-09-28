@@ -11,7 +11,7 @@ test('HTTP demo, disabled live mode and static-file boundary',async()=>{
  assert.equal(config.live,false);
  assert.equal(config.auth,true);
  assert.equal(config.billing.provider,'kiwify');
- assert.equal(config.billing.configured,false);
+ assert.equal(config.billing.configured,true);
  const req=mode=>fetch(base+'/api/search',{method:'POST',headers:{'Content-Type':'application/json','X-Cub4-Client':'lead-finder'},body:JSON.stringify({niche:'Dentist',location:'Austin',limit:2,mode})});
  const demo=await (await req('demo')).json();assert.equal(demo.leads.length,2);assert.equal(demo.demo,true);
  assert.equal((await req('live')).status,503);
@@ -22,7 +22,7 @@ test('HTTP demo, disabled live mode and static-file boundary',async()=>{
 
 test('auth session, checkout gate and signed webhook',async()=>{
  const dir=await mkdtemp(join(tmpdir(),'lf-auth-http-'));
- const proc=spawn(process.execPath,['server.mjs'],{env:{...process.env,PORT:'4193',HOST:'127.0.0.1',DATA_DIR:dir,ENABLE_LIVE_SEARCH:'true',OUTSCRAPER_API_KEY:'test-key',ENABLE_SAMPLE_DATA:'false',MP_WEBHOOK_SECRET:'whsec',APP_ORIGIN:'http://127.0.0.1:4193'},stdio:['ignore','pipe','pipe']});
+ const proc=spawn(process.execPath,['server.mjs'],{env:{...process.env,PORT:'4193',HOST:'127.0.0.1',DATA_DIR:dir,ENABLE_LIVE_SEARCH:'true',OUTSCRAPER_API_KEY:'test-key',ENABLE_SAMPLE_DATA:'false',MP_WEBHOOK_SECRET:'whsec',APP_ORIGIN:'http://127.0.0.1:4193',BILLING_PROVIDER:'kiwify',KIWIFY_CHECKOUT_ESSENCIAL:'https://pay.kiwify.com.br/UaYc7RN',KIWIFY_CHECKOUT_PROFISSIONAL:'https://pay.kiwify.com.br/mE9NqXs',KIWIFY_CHECKOUT_ESCALA:'https://pay.kiwify.com.br/kgDUfXS'},stdio:['ignore','pipe','pipe']});
  try{await new Promise((resolve,reject)=>{proc.stdout.once('data',resolve);proc.once('error',reject);proc.once('exit',code=>reject(new Error('Server exited '+code)));});
  const base='http://127.0.0.1:4193';
  const headers={'Content-Type':'application/json','X-Cub4-Client':'lead-finder',Origin:'http://127.0.0.1:4193'};
@@ -38,7 +38,8 @@ test('auth session, checkout gate and signed webhook',async()=>{
  const live=await fetch(base+'/api/search',{method:'POST',headers:{...headers,cookie},body:JSON.stringify({niche:'Dentist',location:'Austin',limit:2,mode:'live'})});
  assert.equal(live.status,402);
  const checkout=await fetch(base+'/api/billing/checkout',{method:'POST',headers:{...headers,cookie},body:JSON.stringify({planId:'essencial'})});
- assert.equal(checkout.status,503);
+ assert.equal(checkout.status,200);
+ assert.match((await checkout.json()).initPoint,/https:\/\/pay\.kiwify\.com\.br\/UaYc7RN/);
  assert.equal((await fetch(base+'/api/billing/webhook/mercadopago',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'payment',data:{id:'1'}})})).status,401);
  const plans=await (await fetch(base+'/api/plans')).json();
  assert.equal(plans.plans.length,3);

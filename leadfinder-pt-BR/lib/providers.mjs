@@ -9,6 +9,12 @@ export const PROVIDERS = Object.freeze({
 
 const PLAN_IDS = ['essencial', 'profissional', 'escala'];
 
+export const DEFAULT_KIWIFY_CHECKOUTS = Object.freeze({
+  essencial: 'https://pay.kiwify.com.br/UaYc7RN',
+  profissional: 'https://pay.kiwify.com.br/mE9NqXs',
+  escala: 'https://pay.kiwify.com.br/kgDUfXS'
+});
+
 function envValue(env, ...keys) {
   for (const key of keys) {
     const value = String(env[key] || '').trim();
@@ -47,7 +53,7 @@ export function checkoutUrlFor(planId, env = process.env, providerId = resolvePr
   if (!plan) return '';
   const key = plan.id.toUpperCase();
   if (providerId === 'kiwify') {
-    return envValue(env, `KIWIFY_CHECKOUT_${key}`, `CHECKOUT_URL_${key}`);
+    return envValue(env, `KIWIFY_CHECKOUT_${key}`, `CHECKOUT_URL_${key}`) || DEFAULT_KIWIFY_CHECKOUTS[plan.id] || '';
   }
   if (providerId === 'hosted') {
     return envValue(env, `CHECKOUT_URL_${key}`, `KIWIFY_CHECKOUT_${key}`);

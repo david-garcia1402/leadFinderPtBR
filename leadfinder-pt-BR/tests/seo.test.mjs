@@ -22,7 +22,14 @@ test('localized pricing and plan handoff agree, without claiming active subscrip
   const cards = [...html.matchAll(/<div class="price">(.*?)<\/div>/g)].map(m=>m[1].replace(/<[^>]+>/g,''));
   assert.deepEqual(cards, prices);
   for (const price of prices) assert.equal(html.split(`data-price="${price}"`).length - 1, 2);
-  assert.match(html, english ? /Subscriptions are not available yet/ : /Assinaturas ainda não disponíveis/);
+  if (english) assert.match(html, /Subscriptions are not available yet/);
+  else {
+    assert.match(html, /checkout Kiwify do plano correspondente/);
+    assert.match(html, /href="\/entrar\?plano=essencial"/);
+    assert.match(html, /href="\/entrar\?plano=profissional"/);
+    assert.match(html, /href="\/entrar\?plano=escala"/);
+    assert.doesNotMatch(html, /Assinaturas ainda não disponíveis/);
+  }
   const json = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   assert.equal(json['@type'], 'SoftwareApplication'); assert.equal(json.offers, undefined);
   assert.match(await readFile('public/workspace.html','utf8'), /noindex, nofollow/);
