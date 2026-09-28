@@ -1,35 +1,44 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Entrar — Lead Finder</title><meta name="description" content="Crie sua conta ou entre no Lead Finder para gerenciar seu plano e a franquia mensal."><link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/landing.css"><meta name="robots" content="noindex, nofollow"></head>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#100b19"><title>Entrar — Lead Finder</title><meta name="description" content="Crie sua conta ou entre no Lead Finder para gerenciar seu plano e a franquia mensal."><link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/landing.css"><meta name="robots" content="noindex, nofollow"></head>
 <body class="auth-page">
 <a class="skip" href="#main">Pular para o conteúdo</a>
-<header class="top"><a class="brand" href="/" aria-label="Lead Finder início"><img src="/logo.svg" width="40" height="40" alt=""><span>lead<span class="peach">finder</span><small>by cub4Studio</small></span></a><nav aria-label="Navegação da conta"><a href="/">Início</a><a href="/conta">Conta e plano</a></nav></header>
+<header class="top"><a class="brand" href="/" aria-label="Lead Finder início"><img src="/logo.svg" width="40" height="40" alt=""><span>lead<span class="peach">finder</span><small>by cub4Studio</small></span></a><nav aria-label="Navegação da conta"><a href="/">Início</a><a href="/#planos">Planos</a><a href="/app">Painel</a></nav></header>
 <main id="main" class="wrap auth-shell">
   <p class="eyebrow"><i></i> SUA CONTA</p>
-  <h1>Entre para usar o painel<br><em>e preparar o checkout.</em></h1>
-  <p class="auth-lead">A busca real fica ligada à sua conta e à franquia do plano. Use o mesmo e-mail da compra no checkout. A franquia só libera depois da confirmação do webhook.</p>
-  <div class="auth-card qualification" id="auth-card">
-    <div class="auth-tabs" role="tablist">
-      <button type="button" class="active" id="tab-login" role="tab" aria-selected="true">Entrar</button>
-      <button type="button" id="tab-register" role="tab" aria-selected="false">Criar conta</button>
+  <h1 id="auth-title">Entre para começar<br><em>a prospectar.</em></h1>
+  <p class="auth-lead" id="auth-lead">Criar a conta é gratuito. Depois, escolha um plano para liberar a busca de empresas reais.</p>
+  <p class="plan-picked" id="plan-picked" hidden></p>
+  <div class="auth-card" id="auth-card">
+    <div class="auth-tabs" role="tablist" aria-label="Entrar ou criar conta">
+      <button type="button" class="active" id="tab-login" role="tab" aria-selected="true" aria-controls="login-form">Já tenho conta</button>
+      <button type="button" id="tab-register" role="tab" aria-selected="false" aria-controls="register-form" tabindex="-1">Criar conta</button>
     </div>
-    <form id="login-form">
+    <form id="login-form" class="auth-form" role="tabpanel" aria-labelledby="tab-login">
       <label for="login-email">E-mail</label>
-      <input id="login-email" name="email" type="email" autocomplete="username" required maxlength="160">
+      <input id="login-email" name="email" type="email" autocomplete="username" inputmode="email" required maxlength="160" placeholder="voce@empresa.com.br">
       <label for="login-password">Senha</label>
-      <input id="login-password" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128">
-      <button class="button" type="submit">Entrar no painel <span>↗</span></button>
+      <div class="password">
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required minlength="8" maxlength="128" placeholder="Sua senha">
+        <button type="button" class="reveal" data-reveal="login-password" aria-label="Mostrar senha" aria-pressed="false">Mostrar</button>
+      </div>
+      <button class="button" type="submit">Entrar <span aria-hidden="true">↗</span></button>
+      <p class="auth-hint">Esqueceu a senha? <a class="text-link" href="https://cub4studio.com/#contato" target="_blank" rel="noopener">Fale com o suporte</a> para recuperar o acesso.</p>
     </form>
-    <form id="register-form" hidden>
-      <label for="register-name">Nome (opcional)</label>
-      <input id="register-name" name="name" type="text" autocomplete="name" maxlength="80">
+    <form id="register-form" class="auth-form" role="tabpanel" aria-labelledby="tab-register" hidden>
+      <label for="register-name">Seu nome <span class="optional">(aparece nos rascunhos de mensagem)</span></label>
+      <input id="register-name" name="name" type="text" autocomplete="name" maxlength="80" placeholder="Ex.: Ana Souza">
       <label for="register-email">E-mail</label>
-      <input id="register-email" name="email" type="email" autocomplete="email" required maxlength="160">
+      <input id="register-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160" placeholder="voce@empresa.com.br">
+      <p class="auth-hint">Use o mesmo e-mail que você vai usar no pagamento. É assim que o plano é ligado à sua conta.</p>
       <label for="register-password">Senha</label>
-      <input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128">
-      <p class="auth-hint">Mínimo de 8 caracteres. A senha fica só no servidor, com hash.</p>
-      <button class="button" type="submit">Criar conta <span>↗</span></button>
+      <div class="password">
+        <input id="register-password" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" placeholder="Mínimo de 8 caracteres" aria-describedby="password-hint">
+        <button type="button" class="reveal" data-reveal="register-password" aria-label="Mostrar senha" aria-pressed="false">Mostrar</button>
+      </div>
+      <p class="auth-hint" id="password-hint">Mínimo de 8 caracteres.</p>
+      <button class="button" type="submit">Criar conta grátis <span aria-hidden="true">↗</span></button>
     </form>
-    <p id="auth-status" role="status"></p>
+    <p id="auth-status" class="form-status" role="status"></p>
   </div>
 </main>
 <script src="/auth.js" type="module"></script>
