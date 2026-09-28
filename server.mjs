@@ -5,7 +5,7 @@ import {randomUUID} from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 import {seoLinks,robots,sitemap,publicOrigin} from './lib/seo.mjs';
 import {validateSearch,demoLeads} from './lib/leads.mjs';
-import {beginSearch,checkSearch} from './lib/outscraper.mjs';
+import {beginSearch,checkSearch,liveSearchEnabled,LIVE_UNAVAILABLE} from './lib/outscraper.mjs';
 import {createStore} from './lib/store.mjs';
 import {createAuth,parseCookies,publicUser,sessionCookie} from './lib/auth.mjs';
 import {listPlans} from './lib/plans.mjs';
@@ -19,7 +19,7 @@ const arg = name => {
 const port = Number(arg('--port') || process.env.PORT || 4173);
 const host = arg('--host') || process.env.HOST || '127.0.0.1';
 const preview = process.env.ENABLE_SAMPLE_DATA === 'true';
-const live = process.env.ENABLE_LIVE_SEARCH === 'true' && !!process.env.OUTSCRAPER_API_KEY;
+const live = liveSearchEnabled(process.env);
 const dataDir = process.env.DATA_DIR || root + '.data';
 const store = await createStore(dataDir.replace(/\/?$/, '/') + 'accounts.json');
 const auth = createAuth(store);
@@ -179,17 +179,17 @@ const server = http.createServer(async (req, res) => {
       const payload = await body(req);
       const search = validateSearch(payload);
       if (payload.mode === 'demo') {
-        if (!preview) return send(res, 503, {error: 'Dados ilustrativos desativados. Configure a busca real ou ative os exemplos explicitamente.'});
+        if (!preview) return send(res, 503, {error: 'A demonstração com empresas fictícias está desativada neste servidor.'});
         return send(res, 200, {leads: demoLeads(search.niche, search.location, search.limit), demo: true});
       }
       if (payload.mode !== 'live') return send(res, 400, {error: 'Selecione uma fonte de busca válida.'});
-      if (!live) return send(res, 503, {error: 'Busca real ainda indisponível. Entre em contato com a cub4Studio.'});
+      if (!live) return send(res, 503, {error: LIVE_UNAVAILABLE});
       const user = requestUser(req);
-      if (!user) return send(res, 401, {error: 'Entre na sua conta para usar a busca real.'});
-      const quota = await billing.reserve(user.id, search.limit);
+      if (!user) return send(res, 401, {error: 'Entre na sua conta para buscar empresas.'});
       const cacheKey = user.id + ':' + JSON.stringify(search).toLowerCase();
-      if (cache.has(cacheKey)) return send(res, 200, {...cache.get(cacheKey), cached: true, quota});
-      if (busy || Date.now() - lastLive < 10000) return send(res, 429, {error: 'Aguarde antes de iniciar outra busca.'});
+      if (cache.has(cacheKey)) return send(res, 200, {...cache.get(cacheKey), cached: true, quota: billing.statusFor(user.id)});
+      if (busy || Date.now() - lastLive < 10000) return send(res, 429, {error: 'Aguarde alguns segundos antes de iniciar outra busca.'});
+      const quota = await billing.reserve(user.id, search.limit);
       busy = true;
       lastLive = Date.now();
       try {
@@ -201,6 +201,9 @@ const server = http.createServer(async (req, res) => {
         }
         cache.set(cacheKey, result);
         return send(res, 200, {...result, quota});
+      } catch (error) {
+        await billing.release(user.id, search.limit);
+        throw error;
       } finally {
         busy = false;
       }
@@ -211,7 +214,7 @@ const server = http.createServer(async (req, res) => {
       if (!user) return send(res, 401, {error: 'Entre na sua conta para acompanhar a busca.'});
       const jobId = url.pathname.split('/').pop();
       const job = jobs.get(jobId);
-      if (!job || job.userId !== user.id) return send(res, 404, {error: 'Sessão de busca expirada. Confira o painel do provedor antes de repetir.'});
+      if (!job || job.userId !== user.id) return send(res, 404, {error: 'Esta busca expirou. Faça a busca novamente.'});
       if (Date.now() - job.last < 5000) return send(res, 202, {pending: true});
       job.last = Date.now();
       const result = await checkSearch(job.providerId, process.env.OUTSCRAPER_API_KEY);
@@ -235,6 +238,7 @@ const server = http.createServer(async (req, res) => {
       '/app.js': 'public/app.js',
       '/style.css': 'public/style.css',
       '/leads.mjs': 'lib/leads.mjs',
+      '/suggestions.mjs': 'public/suggestions.mjs',
       '/fonts/plus-jakarta-sans-latin-wght-normal.woff2': 'public/fonts/plus-jakarta-sans-latin-wght-normal.woff2',
       '/fonts/plus-jakarta-sans-latin-wght-italic.woff2': 'public/fonts/plus-jakarta-sans-latin-wght-italic.woff2'
     };

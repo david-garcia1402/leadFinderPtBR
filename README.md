@@ -44,14 +44,21 @@ Na primeira requisição o Worker cria `users`, `sessions` e `app_records` se ai
 - Preservados filtros, favoritos no navegador, CSV e rascunho de abordagem.
 - Configuração explícita de origem HTTPS, menor exposição de informações do servidor e restrição adicional para busca real local.
 
-## Conectar a busca real para uso local
-Copie `.env.example` para `.env`. Preencha `OUTSCRAPER_API_KEY`, defina `ENABLE_LIVE_SEARCH=true` e mantenha `HOST=127.0.0.1`. Use `APP_ORIGIN=http://127.0.0.1:4173` e abra exatamente esse endereço. Defina um teto conservador em `MAX_MONTHLY_RECORDS`. Reinicie o servidor. Se executar dist, coloque o .env dentro de dist.
-Não inclua .env em ZIP, Git ou frontend. A chave permanece no servidor.
-A integração foi preservada; não foi testada com credenciais reais. Antes de consumir, confirme custos, permissões e limites da sua conta no provedor. Nenhum crédito ou serviço foi contratado.
-O teto local é global, não por assinante nem um teto financeiro no provedor. Reservas não são estornadas automaticamente em falhas. Use uma única instância; jobs/cache são em memória. A renovação mensal ocorre na inicialização. Não reinicie durante consultas pendentes.
+## Como ativar a busca real
+O aviso “Busca ainda não ativada” no painel significa que o servidor não tem a chave do provedor de dados (Outscraper). Sem ela, nenhuma busca é feita e o painel mostra esse estado para todos os visitantes.
+
+Para ativar:
+1. Crie uma conta em outscraper.com, adicione créditos e copie a API key (Profile → API Key).
+2. Cloudflare Workers: rode `npx wrangler secret put OUTSCRAPER_API_KEY` na raiz do repositório e cole a chave (ou cadastre em Workers → leadfinder-pt-br → Settings → Variables and Secrets, como *Secret*). Salvar o secret já publica uma nova versão do Worker; não é preciso mudar código.
+3. Local: copie `.env.example` para `.env`, preencha `OUTSCRAPER_API_KEY` e reinicie `npm run dev`.
+
+A chave sozinha liga a busca. Para desligar temporariamente sem apagar a chave, defina `ENABLE_LIVE_SEARCH=false`. Depois de ativada, cada cliente ainda precisa estar logado e com plano ativo; o painel mostra o próximo passo (entrar, escolher plano ou franquia esgotada).
+A chave permanece no servidor; não inclua `.env` em ZIP, Git ou frontend. Confirme custos e limites da sua conta no provedor antes de vender. Se o provedor recusar a chave ou ficar sem créditos, o cliente vê uma mensagem clara e a franquia reservada é devolvida.
+
+A franquia é por assinante; não existe teto financeiro no provedor, então configure limites de gasto na conta Outscraper. A reserva é devolvida quando o provedor recusa a busca logo no início; falhas durante o processamento não são estornadas. No servidor Node local, jobs/cache ficam em memória (use uma única instância); no Worker, o acompanhamento da busca usa um token assinado e funciona entre instâncias. A renovação mensal ocorre na inicialização. Não reinicie durante consultas pendentes.
 
 ## Exemplos para desenvolvimento
-Opcionalmente defina `ENABLE_SAMPLE_DATA=true` e escolha a fonte de exemplos no painel. Dados ficam explicitamente identificados como fictícios. Não use exemplos como resultados reais em anúncios. Dados salvos nesta versão ficam apenas no navegador.
+Opcionalmente defina `ENABLE_SAMPLE_DATA=true`. Sem busca real, o painel entra direto no modo demonstração; com as duas ligadas, aparece a opção “Empresas reais / Demonstração”. Dados ficam explicitamente identificados como fictícios. Não use exemplos como resultados reais em anúncios. Dados salvos nesta versão ficam apenas no navegador.
 
 ## Estado real do produto
 Esta versão pt-BR agora tem contas com e-mail/senha, sessão HttpOnly e franquia por cliente. O checkout padrão é a **Kiwify**, com adaptadores para Mercado Pago e para qualquer checkout hospedado (Hotmart, Eduzz, Stripe Payment Link, etc.). Sem variáveis, os três checkouts públicos (Essencial, Profissional e Escala) são usados. A franquia só libera com `KIWIFY_WEBHOOK_TOKEN`. Use o mesmo e-mail da compra e da conta. Não anunciar retorno financeiro.
@@ -82,7 +89,7 @@ Preços e franquias são hipóteses comerciais, não recomendações baseadas em
 `public/index.html`: página comercial, preços e contatos.
 `public/landing.css`: identidade e layout.
 `public/landing.js`: seleção de interesse.
-`public/workspace.html`, `public/app.js`, `public/style.css`: painel.
+`public/workspace.html`, `public/app.js`, `public/style.css`: painel. `public/suggestions.mjs`: sugestões de segmentos e cidades do autocomplete.
 `public/auth.html`, `public/account.html` e respectivos JS: conta e plano.
 `public/logo.svg`: símbolo vetorial.
 `server.mjs` e `lib/`: backend, autenticação e provedores de checkout (Kiwify, Mercado Pago, genérico).

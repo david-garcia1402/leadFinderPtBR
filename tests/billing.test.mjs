@@ -51,6 +51,9 @@ test('subscription reserve is per user and blocks inactive accounts', async () =
     const otherQuota = await billing.reserve(other.id, 25);
     assert.equal(otherQuota.quota, 300);
     assert.equal(billing.statusFor(user.id).remaining, 60);
+    const released = await billing.release(user.id, 40);
+    assert.equal(released.remaining, 100);
+    assert.equal((await billing.release(user.id, 40)).remaining, 100);
   } finally {
     await rm(dir, {recursive:true, force:true});
   }

@@ -1,23 +1,35 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conta e plano — Lead Finder</title><meta name="description" content="Acompanhe sua conta, a franquia do plano e o checkout do Lead Finder."><link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/landing.css"><meta name="robots" content="noindex, nofollow"></head>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#100b19"><title>Conta e plano — Lead Finder</title><meta name="description" content="Acompanhe sua conta, a franquia do plano e o checkout do Lead Finder."><link rel="icon" href="/logo.svg"><link rel="stylesheet" href="/landing.css"><meta name="robots" content="noindex, nofollow"></head>
 <body class="auth-page">
 <a class="skip" href="#main">Pular para o conteúdo</a>
-<header class="top"><a class="brand" href="/" aria-label="Lead Finder início"><img src="/logo.svg" width="40" height="40" alt=""><span>lead<span class="peach">finder</span><small>by cub4Studio</small></span></a><nav aria-label="Navegação da conta"><a href="/app">Painel</a><a href="/entrar">Entrar</a></nav></header>
-<main id="main" class="wrap auth-shell">
+<header class="top"><a class="brand" href="/" aria-label="Lead Finder início"><img src="/logo.svg" width="40" height="40" alt=""><span>lead<span class="peach">finder</span><small>by cub4Studio</small></span></a><nav aria-label="Navegação da conta"><a href="/app">Painel</a><a href="/entrar" id="nav-login">Entrar</a><button type="button" class="nav-button" id="nav-logout" hidden>Sair</button></nav></header>
+<main id="main" class="wrap auth-shell account-shell">
   <p class="eyebrow"><i></i> CONTA E PLANO</p>
-  <h1>Sua franquia fica<br><em>ligada à sua conta.</em></h1>
-  <p class="auth-lead" id="account-lead">Entre para ver o status da assinatura. O checkout só inicia quando o provedor de pagamento estiver configurado.</p>
-  <section class="auth-card" id="session-card">
-    <p class="mini-label">SESSÃO</p>
-    <p id="session-line">Verificando sua sessão…</p>
+  <h1 id="account-title">Sua conta e<br><em>seu plano.</em></h1>
+  <p class="auth-lead" id="account-lead">Carregando sua conta…</p>
+  <section class="auth-card account-card" id="session-card" aria-labelledby="session-label">
+    <p class="mini-label" id="session-label">SUA CONTA</p>
+    <div class="account-summary">
+      <div>
+        <p class="account-name" id="session-line">Verificando sua sessão…</p>
+        <p class="account-meta" id="session-plan"></p>
+      </div>
+      <span class="status-chip" id="session-status" hidden></span>
+    </div>
+    <div class="quota" id="session-quota" hidden>
+      <progress id="session-quota-bar" max="1" value="0"></progress>
+      <p id="session-quota-text"></p>
+    </div>
     <div class="auth-actions">
-      <a class="button small outline" href="/entrar">Entrar ou criar conta</a>
+      <a class="button small" id="login-link" href="/entrar?next=/conta">Entrar ou criar conta <span aria-hidden="true">↗</span></a>
+      <a class="button small" id="panel-link" href="/app" hidden>Abrir painel <span aria-hidden="true">↗</span></a>
       <button class="button small outline" id="logout" type="button" hidden>Sair</button>
-      <a class="text-link" href="/app">Abrir painel →</a>
     </div>
   </section>
-  <section class="plans account-plans" id="plans"></section>
-  <p id="checkout-status" role="status"></p>
+  <h2 class="plans-title" id="plans-title">Planos mensais</h2>
+  <p class="plans-sub">Preços em reais (BRL). A cobrança é feita pelo checkout seguro do parceiro de pagamento.</p>
+  <section class="plans account-plans" id="plans" aria-labelledby="plans-title"></section>
+  <p id="checkout-status" class="form-status" role="status"></p>
 </main>
 <script src="/account.js" type="module"></script>
 </body></html>
