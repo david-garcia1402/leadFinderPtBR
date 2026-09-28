@@ -3,7 +3,7 @@ export function normalize(raw, demo = false) {
  return {id:String(raw.place_id || raw.google_id || `${raw.name}|${raw.full_address}`),name:String(raw.name || 'Empresa sem nome'),category:String(raw.type || raw.category || ''),address:String(raw.full_address || ''),phone:String(raw.phone || ''),website,rating:Number(raw.rating)||null,reviews:Number(raw.reviews)||0,source:demo?'Dados ilustrativos':'Outscraper / Google Maps',sourceUrl:/^https?:\/\//i.test(raw.location_link||'')?raw.location_link:'',retrievedAt:new Date().toISOString(),demo};
 }
 export function demoLeads(niche, location, limit) {
- return ['Northline','Juniper','Parkside','Oak & Co.','Union','Brightway','West End','Cedar House','The Local','Brookside','Summit','Horizon'].slice(0,limit).map((n,i)=>normalize({name:`${n} ${niche} (exemplo)`,place_id:`demo-${niche}-${location}-${i}`,type:niche,full_address:`${location} · Exemplo fictício`,site:i%3===0?'':`https://example.com/business-${i}`,phone:i%4===0?'':`+1 202-555-${String(100+i).padStart(4,'0')}`,rating:4+(i%10)/10,reviews:15+i*23},true));
+ return ['Horizonte','Aurora','Bela Vista','Ipê','Central','Nova Era','Jardim','Primavera','Do Bairro','Vila Rica','Estrela','Atlântico','Mirante','Paineira','Recanto','Aliança','Porto','Serra','Girassol','Boa Praça','Laranjeiras','Cambuí','Harmonia','Cristal','Vitória'].slice(0,limit).map((n,i)=>normalize({name:`${n} ${niche} (exemplo)`,place_id:`demo-${niche}-${location}-${i}`,type:niche,full_address:`${location} · Exemplo fictício`,site:i%3===0?'':`https://example.com/business-${i}`,phone:i%4===0?'':`(11) 5555-${String(100+i).padStart(4,'0')}`,rating:4+(i%10)/10,reviews:15+i*23},true));
 }
 export function validateSearch(body) {
  const niche=String(body.niche||'').trim(), location=String(body.location||'').trim(), limit=Number(body.limit??10);
@@ -12,6 +12,7 @@ export function validateSearch(body) {
 }
 export function csv(rows) {
  const keys=['name','category','address','phone','website','rating','reviews','source','sourceUrl','retrievedAt','demo'];
+ const labels=['Empresa','Categoria','Endereço','Telefone','Site','Nota','Avaliações','Fonte','Link da fonte','Consultado em','Exemplo fictício'];
  const cell=v=>'"'+String(v??'').replace(/^[\s]*[=+@-]/,"'$&").replaceAll('"','""')+'"';
- return '\ufeff'+[keys.join(','),...rows.map(r=>keys.map(k=>cell(r[k])).join(','))].join('\r\n');
+ return '\ufeff'+[labels.map(cell).join(','),...rows.map(r=>keys.map(k=>cell(k==='demo'?(r.demo?'Sim':'Não'):r[k])).join(','))].join('\r\n');
 }
