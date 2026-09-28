@@ -27,11 +27,11 @@ Não é um site puramente estático: o painel depende do servidor Node. Não abr
 
 ## Cloudflare Workers
 
-O build do Cloudflare executa `npx wrangler deploy` na raiz do repositório. O `wrangler.jsonc` dessa raiz define `assets.directory` como `./leadfinder-pt-BR/public`. O Wrangler só procura `index.html` na pasta atual e nos filhos imediatos; com o site em `leadfinder-pt-BR/public/`, a detecção automática falha com "Could not detect a directory containing static files".
+O build do Cloudflare executa `npx wrangler deploy` na raiz do repositório. O `wrangler.jsonc` dessa raiz aponta `main` para `leadfinder-pt-BR/src/worker.mjs` e `assets.directory` para `./leadfinder-pt-BR/public`. O Worker atende páginas e `/api/*`; o binding `DB` grava contas no D1 `leadfinder-db`.
 
-Se a raiz do build no painel for `leadfinder-pt-BR`, vale o `wrangler.jsonc` dessa pasta (`assets.directory`: `./public`). Os dois arquivos publicam o mesmo Worker, `leadfinder-pt-br`.
+Se a raiz do build no painel for `leadfinder-pt-BR`, vale o `wrangler.jsonc` dessa pasta (`main`: `src/worker.mjs`, `assets.directory`: `./public`, o mesmo `database_id`). Os dois arquivos publicam o mesmo Worker, `leadfinder-pt-br`.
 
-`public/_redirects` entrega `/app`, `/entrar` e `/conta`. Contas, busca e checkout continuam no servidor Node (`npm start`).
+Na primeira requisição o Worker cria `users`, `sessions` e `app_records` se ainda não existirem. Tabelas já criadas não são alteradas: as colunas precisam ser as de `schema.sql`. O servidor Node local continua em `.data/accounts.json`.
 
 ## O que mudou
 - Página comercial em português, separada do painel, com copy de benefícios, recursos, FAQ e contato.
