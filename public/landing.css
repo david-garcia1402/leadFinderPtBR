@@ -11,7 +11,7 @@
 .auth-tabs button:focus-visible,.reveal:focus-visible,.button:focus-visible,.nav-button:focus-visible{outline:2px solid var(--peach);outline-offset:3px}
 .password{position:relative}.password input{padding-right:84px}.reveal{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--peach);font:inherit;font-size:12px;font-weight:600;padding:8px 10px;cursor:pointer;border-radius:6px}.reveal:hover{background:#2b1d32}
 .auth-hint{margin:8px 0 0}.auth-hint .text-link{color:var(--peach);font-size:inherit}
-.form-status{min-height:1.4em;margin:16px 0 0}.form-status[data-tone=error]{color:#ffb4b4}.form-status[data-tone=ok]{color:#8fe0b2}
+.form-status{min-height:1.4em;margin:16px 0 0}#auth-status[data-tone=error],#checkout-status[data-tone=error]{color:#ffb4b4}#auth-status[data-tone=ok],#checkout-status[data-tone=ok]{color:#8fe0b2}
 .plan-picked{border:1px solid #6b4551;background:#231726;border-radius:10px;padding:12px 16px;font-size:14px;color:#ebd8e1}.plan-picked b{color:var(--peach)}.plan-picked .text-link{color:var(--peach);margin-left:6px;font-size:13px}
 .account-shell{max-width:1000px}.account-card{max-width:760px}.account-summary{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.account-name{color:#faf6f2;font-weight:600;margin:0;overflow-wrap:anywhere}.account-meta{margin:4px 0 0;font-size:14px}
 .status-chip{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:#3a2a1d;color:#ffc27a;white-space:nowrap}.status-chip[data-tone=ok]{background:#173427;color:#7fd6a4}
